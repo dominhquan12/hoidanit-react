@@ -2,42 +2,33 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { loginAPI } from "../services/UserService"
-import { useContext } from 'react';
-import { UserContext } from '../context/UserContext'
+import { handleLoginRedux } from "../redux/actions/userAction";
+import { useDispatch, useSelector } from "react-redux";
 function Login() {
     let navigate = useNavigate();
-    const { loginContext } = useContext(UserContext)
+    const dispath = useDispatch()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isShowPassword, setIsShowPassword] = useState(false)
-    const [isShowLoading, setIsShowLoading] = useState(false)
+    const isShowLoading = useSelector(state => state.user.isLoading)
+    const account = useSelector(state => state.user.account)
     const handleSubmit = async (event) => {
         event.preventDefault()
         if (!email || !password) {
             toast.error("Email or password is required")
             return
         }
-        let res = await loginAPI({email: email.trim(), password });
-        console.log(">>>>>>>>res", res);
-        if (res && res.token) {
-            loginContext(email, res.token)
-            navigate("/")
-        }
-        else if (res && res.status === 400) {
-            toast(res.data.error)
-        }
-        setIsShowLoading(false)
+        dispath(handleLoginRedux(email, password))
     }
+
     useEffect(() => {
-        let token = localStorage.getItem("token")
-        if (token) {
+        if (account && account.auth === true) {
             navigate("/")
         }
         return () => {
 
         };
-    }, []);
+    }, [account]);
     return (
         <div className="mx-auto mt-4 col-lg-6 col-12 ">
             <h1 className="text-center">Login</h1>

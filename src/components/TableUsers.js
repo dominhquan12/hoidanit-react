@@ -11,7 +11,6 @@ import Papa from "papaparse";
 import { toast } from 'react-toastify';
 function TableUsers() {
     const [listUsers, setListUsers] = useState([])
-    // const [totalUsers, setTotalUsers] = useState(0)
     const [totalPages, setTotalPages] = useState(0)
 
     const [isShowModalAddNew, setIsShowModalAddNew] = useState(false)
@@ -40,7 +39,6 @@ function TableUsers() {
     const getUsers = async (page) => {
         let res = await fetchAllUsers(page)
         if (res && res.data) {
-            // setTotalUsers(res.total);
             setTotalPages(res.total_pages);
             setListUsers(res.data)
         }
@@ -63,7 +61,6 @@ function TableUsers() {
     }
 
     const handleUpdateTableFromDelete = (user) => {
-        // let index = listUsers.findIndex(item => item.id === user.id)
         let cloneListUsers = _.cloneDeep(listUsers)
         console.log(user);
         cloneListUsers = cloneListUsers.filter(item => item.id !== user.id)

@@ -5,28 +5,24 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import logo from '../assets/images/logo192.png'
-import { useContext } from 'react';
-import { UserContext } from '../context/UserContext'
+import { useDispatch, useSelector } from 'react-redux';
+import { handleLogoutRedux } from '../redux/actions/userAction'
+import { useEffect } from 'react';
 function Header(props) {
-  const { logoutContext, user } = useContext(UserContext)
 
-  // const [hideHeader, setHideHeader] = useState(false)
-
-  // useEffect(() => {
-  //   if (window.location.pathname === '/login') {
-  //     setHideHeader(true)
-  //   }
-  //   return () => {
-  //   };
-  // }, []);
-
+  const user = useSelector(state => state.user.account)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   let location = useLocation();
   const handleLogout = () => {
-    logoutContext()
-    navigate("/")
-    toast("Logout successful!")
+    dispatch(handleLogoutRedux())
   }
+  useEffect(() => {
+    if (user && user.auth === false && window.location.pathname !== '/login') {
+      navigate("/")
+      toast("Logout successful!")
+    }
+  }, [user]);
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
@@ -43,7 +39,7 @@ function Header(props) {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           {
-           ((user && user.auth)|| window.location.pathname === '/') &&
+            ((user && user.auth) || window.location.pathname === '/') &&
             <>
               <Nav className="me-auto" activeKey={location.pathname}>
                 <NavLink className="nav-link" to="/">Home</NavLink>
@@ -51,7 +47,7 @@ function Header(props) {
               </Nav>
               <Nav>
                 {user && user.email && <span className='nav-link' >Welcome <strong>{user.email.slice(0, 3)}</strong></span>}
-                <NavDropdown title="Setting" id="basic-nav-dropdown" style={{ left: '-20px', marginLeft:'20px'}}>
+                <NavDropdown title="Setting" id="basic-nav-dropdown" style={{ left: '-20px', marginLeft: '20px' }}>
                   {
                     user && user.auth === true
                       ? <NavDropdown.Item className="nav-link ps-4" onClick={handleLogout}>Logout</NavDropdown.Item>
